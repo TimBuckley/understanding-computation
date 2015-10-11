@@ -89,3 +89,33 @@ expression.reduce.reduce.reduce
 # => «14»
 expression.reduce.reduce.reduce.reducible?
 # => false
+
+
+
+class Machine < Struct.new(:expression)
+    def step
+        self.expression = expression.reduce
+    end
+
+    def run
+        while expression.reducible?
+            puts expression
+            step
+        end
+
+        puts expression
+    end
+end
+
+# Example use of Machine to parse expression.
+Machine.new(
+    Add.new(
+        Multiply.new(Number.new(1), Number.new(2)),
+        Multiply.new(Number.new(3), Number.new(4))
+    )
+).run
+# 1 * 2 + 3 * 4
+# 2 + 3 * 4
+# 2 + 12
+# 14
+# => nil
