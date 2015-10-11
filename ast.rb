@@ -77,7 +77,7 @@ class Multiply < Struct.new(:left, :right)
 
     def reduce(environment)
         if left.reducible?
-            Multiply.new(left.reduce(environment, right)
+            Multiply.new(left.reduce(environment), right)
         elsif right.reducible?
             Multiply.new(left, right.reduce(environment))
         else
@@ -115,11 +115,11 @@ class LessThan < Struct.new(:left, :right)
         true
     end
 
-    def reduce
+    def reduce(environment)
         if left.reducible?
-            LessThan.new(left.reduce, right)
+            LessThan.new(left.reduce(environment), right)
         elsif right.reducible?
-            LessThan.new(left, right.reduce)
+            LessThan.new(left, right.reduce(environment))
         else
             Boolean.new(left.value < right.value)
         end
@@ -128,6 +128,7 @@ end
 
 
 # Example expression to parse.
+env = {}
 expression = Add.new(
     Multiply.new(Number.new(1), Number.new(2)),
     Multiply.new(Number.new(3), Number.new(4))
@@ -135,24 +136,24 @@ expression = Add.new(
 # => «1 * 2 + 3 * 4»
 expression.reducible?
 # => true
-expression.reduce
+expression.reduce(env)
 # => «2 + 3 * 4»
-expression.reduce.reducible?
+expression.reduce(env).reducible?
 # => true
-expression.reduce.reduce
+expression.reduce(env).reduce(env)
 # => «2 + 12»
-expression.reduce.reduce.reducible?
+expression.reduce(env).reduce(env).reducible?
 # => true
-expression.reduce.reduce.reduce
+expression.reduce(env).reduce(env).reduce(env)
 # => «14»
-expression.reduce.reduce.reduce.reducible?
+expression.reduce(env).reduce(env).reduce(env).reducible?
 # => false
 
 
 
-class Machine < Struct.new(:expression)
+class Machine < Struct.new(:expression, :environment)
     def step
-        self.expression = expression.reduce
+        self.expression = expression.reduce(environment)
     end
 
     def run
@@ -170,7 +171,7 @@ Machine.new(
     Add.new(
         Multiply.new(Number.new(1), Number.new(2)),
         Multiply.new(Number.new(3), Number.new(4))
-    )
+    ), {}
 ).run
 # 1 * 2 + 3 * 4
 # 2 + 3 * 4
