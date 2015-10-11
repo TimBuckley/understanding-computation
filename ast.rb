@@ -127,27 +127,52 @@ class LessThan < Struct.new(:left, :right)
 end
 
 
-# Example expression to parse.
-env = {}
-expression = Add.new(
-    Multiply.new(Number.new(1), Number.new(2)),
-    Multiply.new(Number.new(3), Number.new(4))
-)
-# => «1 * 2 + 3 * 4»
-expression.reducible?
-# => true
-expression.reduce(env)
-# => «2 + 3 * 4»
-expression.reduce(env).reducible?
-# => true
-expression.reduce(env).reduce(env)
-# => «2 + 12»
-expression.reduce(env).reduce(env).reducible?
-# => true
-expression.reduce(env).reduce(env).reduce(env)
-# => «14»
-expression.reduce(env).reduce(env).reduce(env).reducible?
-# => false
+class GreaterThan < Struct.new(:left, :right)
+    def to_s
+        "«#{left} > #{right}»"
+    end
+
+    def inspect
+        "«#{self}»"
+    end
+
+    def reducible?
+        true
+    end
+
+    def reduce(environment)
+        if left.reducible?
+            GreaterThan.new(left.reduce(environment), right)
+        elsif right.reducible?
+            GreaterThan.new(left, right.reduce(environment))
+        else
+            Boolean.new(left.value > right.value)
+        end
+    end
+end
+
+
+# # Example expression to parse.
+# env = {}
+# expression = Add.new(
+#     Multiply.new(Number.new(1), Number.new(2)),
+#     Multiply.new(Number.new(3), Number.new(4))
+# )
+# # => «1 * 2 + 3 * 4»
+# expression.reducible?
+# # => true
+# expression.reduce(env)
+# # => «2 + 3 * 4»
+# expression.reduce(env).reducible?
+# # => true
+# expression.reduce(env).reduce(env)
+# # => «2 + 12»
+# expression.reduce(env).reduce(env).reducible?
+# # => true
+# expression.reduce(env).reduce(env).reduce(env)
+# # => «14»
+# expression.reduce(env).reduce(env).reduce(env).reducible?
+# # => false
 
 
 
