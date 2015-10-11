@@ -1,4 +1,5 @@
-# utf 8
+#!/bin/env ruby
+# encoding: utf-8
 
 class Variable < Struct.new(:name)
     def to_s
