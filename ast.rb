@@ -12,6 +12,11 @@ class Number < Struct.new(:value)
     def reducible?
         false
     end
+
+    def reduce
+        puts('No longer reducible')
+        self
+    end
 end
 
 class Add < Struct.new(:left, :right)
