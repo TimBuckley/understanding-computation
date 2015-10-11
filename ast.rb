@@ -1,3 +1,5 @@
+# utf 8
+
 class Number < Struct.new(:value)
     def to_s
         value.to_s
@@ -5,6 +7,10 @@ class Number < Struct.new(:value)
 
     def inspect
         "«#{self}»"
+    end
+
+    def reducible?
+        false
     end
 end
 
@@ -16,6 +22,10 @@ class Add < Struct.new(:left, :right)
     def inspect
         "«#{self}»"
     end
+
+    def reducible?
+        true
+    end
 end
 
 class Multiply < Struct.new(:left, :right)
@@ -25,5 +35,9 @@ class Multiply < Struct.new(:left, :right)
 
     def inspect
         "«#{self}»"
+    end
+
+    def reducible?
+        true
     end
 end
