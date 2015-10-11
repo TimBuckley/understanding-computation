@@ -68,6 +68,35 @@ class Multiply < Struct.new(:left, :right)
 end
 
 
+class Boolean < Struct.new(:value)
+    def to_s
+        value.to_us
+    end
+
+    def inspect
+        "«#{self}»"
+    end
+
+    def reducible?
+        false
+    end
+end
+
+
+class LessThan < Struct.new(:left, :right)
+    def to_s
+        "«#{left} < #{right}»"
+    end
+
+    def inspect
+        "«#{self}»"
+    end
+
+    def reducible?
+        true
+    end
+end
+
 
 # Example expression to parse.
 expression = Add.new(
