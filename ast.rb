@@ -193,22 +193,22 @@ class Machine < Struct.new(:expression, :environment)
 end
 
 # Example use of Machine to parse expression.
-Machine.new(
-    Add.new(
-        Multiply.new(Number.new(1), Number.new(2)),
-        Multiply.new(Number.new(3), Number.new(4))
-    ), {}
-).run
-# 1 * 2 + 3 * 4
-# 2 + 3 * 4
-# 2 + 12
-# 14
-# => nil
+# Machine.new(
+#     Add.new(
+#         Multiply.new(Number.new(1), Number.new(2)),
+#         Multiply.new(Number.new(3), Number.new(4))
+#     ), {}
+# ).run
+# # 1 * 2 + 3 * 4
+# # 2 + 3 * 4
+# # 2 + 12
+# # 14
+# # => nil
 
-Machine.new(
-    Add.new(Variable.new(:x), Variable.new(:y)),
-    { x: Number.new(3), y: Number.new(4) }
-).run
+# Machine.new(
+#     Add.new(Variable.new(:x), Variable.new(:y)),
+#     { x: Number.new(3), y: Number.new(4) }
+# ).run
 
 class DoNothing
     def to_s
@@ -251,3 +251,22 @@ class Assign < Struct.new(:name, :expression)
         end
     end
 end
+
+
+# statement = Assign.new(
+#     :x,
+#     Add.new(Variable.new(:x), Number.new(1))
+# )
+# # "«x = x + 1»"
+# environment = {x: Number.new(2)}
+# # {x: «2»}
+# statement.reducible?
+# # true
+# statement, environment = statement.reduce(environment)
+# # [«x = 2 + 1», {x: «2»}]
+# statement, environment = statement.reduce(environment)
+# # [«x = 3», {x: «2»}]
+# statement, environment = statement.reduce(environment)
+# # [«do-nothing», {x: «3»}]
+# statement.reducible?
+# # false
