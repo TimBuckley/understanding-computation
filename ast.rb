@@ -66,3 +66,26 @@ class Multiply < Struct.new(:left, :right)
         end
     end
 end
+
+
+
+# Example expression to parse.
+expression = Add.new(
+    Multiply.new(Number.new(1), Number.new(2)),
+    Multiply.new(Number.new(3), Number.new(4))
+)
+# => «1 * 2 + 3 * 4»
+expression.reducible?
+# => true
+expression.reduce
+# => «2 + 3 * 4»
+expression.reduce.reducible?
+# => true
+expression.reduce.reduce
+# => «2 + 12»
+expression.reduce.reduce.reducible?
+# => true
+expression.reduce.reduce.reduce
+# => «14»
+expression.reduce.reduce.reduce.reducible?
+# => false
