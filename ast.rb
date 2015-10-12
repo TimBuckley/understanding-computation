@@ -90,7 +90,7 @@ end
 
 class Boolean < Struct.new(:value)
     def to_s
-        value.to_us
+        value.to_s
     end
 
     def inspect
@@ -177,18 +177,18 @@ end
 
 
 
-class Machine < Struct.new(:expression, :environment)
+class Machine < Struct.new(:statement, :environment)
     def step
-        self.expression = expression.reduce(environment)
+        self.statement, self.environment = statement.reduce(environment)
     end
 
     def run
-        while expression.reducible?
-            puts expression
+        while statement.reducible?
+            puts "#{statement}, #{environment}"
             step
         end
 
-        puts expression
+        puts "#{statement}, #{environment}"
     end
 end
 
