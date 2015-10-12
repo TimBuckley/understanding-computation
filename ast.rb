@@ -270,3 +270,61 @@ end
 # # [«do-nothing», {x: «3»}]
 # statement.reducible?
 # # false
+
+
+# Machine.new(
+#     Assign.new(:x, Add.new(Variable.new(:x), Number.new(1))),
+#     {x: Number.new(2)}
+# ).run
+# # x = x + 1, {:x=>«2»}
+# # x = 2 + 1, {:x=>«2»}
+# # x = 3, {:x=>«2»}
+# # do-nothing, {:x=>«3»}
+# # => nil
+
+
+
+class If < Struct.new(:condition, :consequence, :alternative)
+    def to_s
+        "if (#{condition}) { #{consequence} } else { #{alternative} }"
+    end
+
+    def inspect
+        "«#{self}»"
+    end
+
+    def reducible?
+        true
+    end
+
+    def reduce(environment)
+        if condition.reducible?
+            [
+                If.new(condition.reduce(environment),consequence,alternative),
+                environment
+            ]
+        else
+            case condition
+            when Boolean.new(true)
+                [consequence, environment]
+            when Boolean.new(false)
+                [alternative, environment]
+            end
+        end
+    end
+end
+
+
+Machine.new(
+    If.new(
+        Variable.new(:x),
+        Assign.new(:y, Number.new(1)),
+        Assign.new(:y, Number.new(2))
+    ),
+    { x: Boolean.new(true) }
+).run
+# if (x) { y = 1 } else { y = 2 }, {:x=>«true»}
+# if (true) { y = 1 } else { y = 2 }, {:x=>«true»}
+# y = 1, {:x=>«true»}
+# do-nothing, {:x=>«true», :y=>«1»}
+# => true
