@@ -315,16 +315,60 @@ class If < Struct.new(:condition, :consequence, :alternative)
 end
 
 
+# Machine.new(
+#     If.new(
+#         Variable.new(:x),
+#         Assign.new(:y, Number.new(1)),
+#         Assign.new(:y, Number.new(2))
+#     ),
+#     { x: Boolean.new(true) }
+# ).run
+# # if (x) { y = 1 } else { y = 2 }, {:x=>«true»}
+# # if (true) { y = 1 } else { y = 2 }, {:x=>«true»}
+# # y = 1, {:x=>«true»}
+# # do-nothing, {:x=>«true», :y=>«1»}
+# # => true
+
+
+class Sequence < Struct.new(:first, :second)
+    def to_s
+        "#{first}; #{second}"
+    end
+
+    def inspect
+        "«#{self}»"
+    end
+
+    def reducible?
+        true
+    end
+
+    def reduce(environment)
+        case first
+        when DoNothing.new
+            [second, environment]
+        else
+            reduced_first, reduced_environment = first.reduce(environment)
+            [Sequence.new(reduced_first, second), reduced_environment]
+        end
+    end
+end
+
+
+
 Machine.new(
-    If.new(
-        Variable.new(:x),
-        Assign.new(:y, Number.new(1)),
-        Assign.new(:y, Number.new(2))
+    Sequence.new(
+        Assign.new(
+            :x,
+            Add.new(Number.new(1), Number.new(1))),
+        Add.new(Variable.new(:x), Number.new(3))
     ),
-    { x: Boolean.new(true) }
+    {}
 ).run
-# if (x) { y = 1 } else { y = 2 }, {:x=>«true»}
-# if (true) { y = 1 } else { y = 2 }, {:x=>«true»}
-# y = 1, {:x=>«true»}
-# do-nothing, {:x=>«true», :y=>«1»}
+# x = 1 + 1; x + 3, {}
+# x = 2; x + 3, {}
+# do-nothing; x + 3, {:x=>«2»}
+# x + 3, {:x=>«2»}
+# 2 + 3,
+# 5,
 # => true
